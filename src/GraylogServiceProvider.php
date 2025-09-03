@@ -4,7 +4,6 @@ namespace Rpungello\Graylog;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Rpungello\Graylog\Commands\GraylogCommand;
 
 class GraylogServiceProvider extends PackageServiceProvider
 {
