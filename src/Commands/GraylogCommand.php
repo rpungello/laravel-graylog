@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Rpungello\Graylog\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class GraylogCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-graylog';
 
     public $description = 'My command';
 
