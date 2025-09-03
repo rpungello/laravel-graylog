@@ -17,9 +17,6 @@ class GraylogServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('laravel-graylog')
-            ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_laravel_graylog_table')
-            ->hasCommand(GraylogCommand::class);
+            ->hasConfigFile();
     }
 }
