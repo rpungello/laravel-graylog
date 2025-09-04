@@ -45,3 +45,16 @@ it('can construct nested OR queries', function () {
         });
     expect((string) $query)->toBe('field1:"value1" || (field2:"value2" && field3:"value3")');
 });
+
+it('can construct three-tier queries', function () {
+    $query = Builder::begin()
+        ->and('field1', 'value1')
+        ->and(function (Builder $b) {
+            $b->or('field2', 'value2');
+            $b->or(function (Builder $b) {
+                $b->and('field3', 'value3');
+                $b->and('field4', 'value4');
+            });
+        });
+    expect((string)$query)->toBe('field1:"value1" && (field2:"value2" || (field3:"value3" && field4:"value4"))');
+});
