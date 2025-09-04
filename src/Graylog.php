@@ -33,7 +33,7 @@ class Graylog
             ],
         ];
 
-        if (! empty($stack)) {
+        if (! empty($stack) && $stack->hasHandler()) {
             $options['handler'] = $stack;
         }
 
