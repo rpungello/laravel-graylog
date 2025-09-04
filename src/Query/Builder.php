@@ -8,21 +8,19 @@ use Stringable;
 class Builder implements Stringable
 {
     /**
-     * @param Condition[] $conditions
+     * @param  Condition[]  $conditions
      */
-    public function __construct(protected array $conditions = [])
-    {
-    }
+    public function __construct(protected array $conditions = []) {}
 
     public static function begin(): self
     {
-        return new self();
+        return new self;
     }
 
     public function and(string|Closure $field, ?string $value = null, string $operator = '='): self
     {
         if ($field instanceof Closure) {
-            $child = new self();
+            $child = new self;
             $field($child);
             $this->conditions[] = new Condition($child, boolean: '&&');
         } else {
@@ -35,7 +33,7 @@ class Builder implements Stringable
     public function or(string|Closure $field, ?string $value = null, string $operator = '='): self
     {
         if ($field instanceof Closure) {
-            $child = new self();
+            $child = new self;
             $field($child);
             $this->conditions[] = new Condition($child, boolean: '||');
         } else {

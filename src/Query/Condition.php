@@ -6,9 +6,7 @@ use Stringable;
 
 class Condition implements Stringable
 {
-    public function __construct(public string|Builder $field, public string $value = '', public string $operator = '=', public string $boolean = '&&')
-    {
-    }
+    public function __construct(public string|Builder $field, public string $value = '', public string $operator = '=', public string $boolean = '&&') {}
 
     public function __toString()
     {
