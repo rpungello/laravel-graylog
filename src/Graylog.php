@@ -8,6 +8,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use Illuminate\Contracts\Foundation\Application;
+use Rpungello\Graylog\Query\Builder;
 use Rpungello\Graylog\TimeRange\TimeRange;
 
 class Graylog
@@ -70,7 +71,7 @@ class Graylog
      *
      * @throws GuzzleException
      */
-    public function search(string|array $streams, TimeRange $timeRange, string $query, array $fields, int $perPage = 100): array
+    public function search(string|array $streams, TimeRange $timeRange, string|Builder $query, array $fields, int $perPage = 100): array
     {
         $offset = 0;
         $response = [];
@@ -85,7 +86,7 @@ class Graylog
     /**
      * @throws GuzzleException
      */
-    public function countResults(string|array $streams, TimeRange $timeRange, string $query, int $perPage = 100): int
+    public function countResults(string|array $streams, TimeRange $timeRange, string|Builder $query, int $perPage = 100): int
     {
         $offset = 0;
         $count = 0;
