@@ -17,7 +17,7 @@ class Condition implements Stringable
             return "$this->boolean $this->field:/$this->value/";
         } elseif ($this->operator === '=') {
             return "$this->boolean $this->field:\"$this->value\"";
-        } elseif(in_array($this->operator, ['>', '>=', '<', '<='])) {
+        } elseif (in_array($this->operator, ['>', '>=', '<', '<='])) {
             return "$this->boolean $this->field:$this->operator$this->value";
         } else {
             throw new InvalidArgumentException('Unsupported condition type');
