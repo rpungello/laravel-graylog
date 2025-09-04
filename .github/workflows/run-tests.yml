@@ -58,3 +58,6 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/pest --ci
+        env:
+          GRAYLOG_API_HOST: "http://graylog.example.com"
+          GRAYLOG_API_TOKEN: "0123456789abcdef"
