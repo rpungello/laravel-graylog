@@ -4,6 +4,7 @@ namespace Rpungello\Graylog;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use Illuminate\Contracts\Foundation\Application;
@@ -13,7 +14,7 @@ class Graylog
 {
     protected Client $client;
 
-    public function __construct(Application $app)
+    public function __construct(Application $app, ?HandlerStack $stack = null)
     {
         $uri = tap(new Uri)
             ->withScheme($app['config']->get('graylog.https') ? 'https' : 'http')
@@ -29,6 +30,7 @@ class Graylog
             RequestOptions::HEADERS => [
                 'X-Requested-By' => 'rpungello/laravel-graylog',
             ],
+            'handler' => $stack,
         ]);
     }
 
