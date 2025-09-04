@@ -50,6 +50,7 @@ class Graylog
      *     is_leader: boolean,
      *     is_processing: boolean
      * }>
+     *
      * @throws GuzzleException
      */
     public function cluster(): array
@@ -64,6 +65,7 @@ class Graylog
 
     /**
      * @return array<array>
+     *
      * @throws GuzzleException
      */
     public function search(string|array $streams, TimeRange $timeRange, string $query, array $fields, int $perPage = 100): array
@@ -95,6 +97,7 @@ class Graylog
 
     /**
      * @return array<array>
+     *
      * @throws GuzzleException
      */
     public function executeSearch(string|array $streams, TimeRange $timeRange, string $query, array $fields, int $perPage = 100, int $from = 0): array
