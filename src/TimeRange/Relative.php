@@ -8,6 +8,12 @@ class Relative extends TimeRange
 {
     public function __construct(protected int|CarbonInterval $interval) {}
 
+    /**
+     * @return array{
+     *     type: string,
+     *     range: int
+     * }
+     */
     public function toArray(): array
     {
         return [

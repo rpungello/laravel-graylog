@@ -9,7 +9,11 @@ class Absolute extends TimeRange
     public function __construct(protected DateTimeInterface $start, protected DateTimeInterface $end) {}
 
     /**
-     * {@inheritDoc}
+     * @return array{
+     *     type: string,
+     *     from: string,
+     *     to: string
+     * }
      */
     public function toArray(): array
     {
