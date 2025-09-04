@@ -6,12 +6,10 @@ use DateTimeInterface;
 
 class Absolute extends TimeRange
 {
-    public function __construct(protected DateTimeInterface $start, protected DateTimeInterface $end)
-    {
-    }
+    public function __construct(protected DateTimeInterface $start, protected DateTimeInterface $end) {}
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function toArray(): array
     {
