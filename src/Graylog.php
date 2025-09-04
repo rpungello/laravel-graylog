@@ -22,7 +22,7 @@ class Graylog
             ->withHost($app['config']->get('graylog.host'))
             ->withPort($app['config']->get('graylog.port'));
 
-        $this->client = new Client([
+        $options = [
             'base_uri' => $uri,
             RequestOptions::AUTH => [
                 $app['config']->get('graylog.token'),
@@ -31,8 +31,13 @@ class Graylog
             RequestOptions::HEADERS => [
                 'X-Requested-By' => 'rpungello/laravel-graylog',
             ],
-            'handler' => $stack,
-        ]);
+        ];
+
+        if (! empty($stack)) {
+            $options['handler'] = $stack;
+        }
+
+        $this->client = new Client($options);
     }
 
     /**
