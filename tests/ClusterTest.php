@@ -22,8 +22,8 @@ it('can parse cluster data', function () {
                 'operating_system' => 'Linux',
                 'is_leader' => true,
                 'is_processing' => true,
-            ]
-        ]))
+            ],
+        ])),
     ]);
     $client = new Graylog(app(), HandlerStack::create($mock));
     $cluster = $client->cluster();
