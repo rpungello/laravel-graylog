@@ -36,8 +36,8 @@ it('can parse cluster data', function () {
         ->and($cluster[0])->toHaveKey('version', '1.2.3')
         ->and($cluster[0])->toHaveKey('started_at', '2025-01-01T00:00:00.000Z')
         ->and($cluster[0])->toHaveKey('hostname', 'hostname')
-        ->and($cluster[0])->toHaveKey('lifecycle', 'lifecycle'
-        )->and($cluster[0])->toHaveKey('lb_status', 'active')
+        ->and($cluster[0])->toHaveKey('lifecycle', 'lifecycle')
+        ->and($cluster[0])->toHaveKey('lb_status', 'active')
         ->and($cluster[0])->toHaveKey('timezone', 'UTC')
         ->and($cluster[0])->toHaveKey('operating_system', 'Linux')
         ->and($cluster[0])->toHaveKey('is_leader', true)
