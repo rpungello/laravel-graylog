@@ -1,33 +1,29 @@
-# Laravel package that utilizes the Graylog messages API to search for messages
+# Laravel Graylog
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/rpungello/laravel-graylog.svg?style=flat-square)](https://packagist.org/packages/rpungello/laravel-graylog)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/rpungello/laravel-graylog/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/rpungello/laravel-graylog/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/rpungello/laravel-graylog/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/rpungello/laravel-graylog/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/rpungello/laravel-graylog.svg?style=flat-square)](https://packagist.org/packages/rpungello/laravel-graylog)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-graylog.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-graylog)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+Laravel package that utilizes the Graylog messages API to search for messages
 
 ## Installation
 
-You can install the package via composer:
+You can install the package via composer, but first you need to add my composer repository to your composer.json file:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://composer.rpun.dev"
+        }
+    ]
+}
+```
+
+Then you can install the package:
 
 ```bash
 composer require rpungello/laravel-graylog
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="laravel-graylog-migrations"
-php artisan migrate
 ```
 
 You can publish the config file with:
@@ -40,20 +36,41 @@ This is the contents of the published config file:
 
 ```php
 return [
+    'https' => env('GRAYLOG_API_HTTPS', false),
+    'host' => env('GRAYLOG_API_HOST'),
+    'port' => env('GRAYLOG_API_PORT', 9000),
+    'token' => env('GRAYLOG_API_TOKEN'),
 ];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="laravel-graylog-views"
 ```
 
 ## Usage
 
+### Get Cluster Info
+
 ```php
-$graylog = new Rpungello\Graylog();
-echo $graylog->echoPhrase('Hello, Rpungello!');
+\Rpungello\Graylog\Facades\Graylog::cluster();
+```
+
+### Run a Search
+
+```php
+\Rpungello\Graylog\Facades\Graylog::search(
+    '000000000000',
+    new \Rpungello\Graylog\TimeRange\Relative(new \Carbon\CarbonInterval(weeks: 4)),
+    'field:value && other_field:other_value',
+    ['field1', 'field2']
+);
+```
+
+### Count Results
+Runs a search, but instead of retrieving the data, simply returns the number of matching records
+
+```php
+\Rpungello\Graylog\Facades\Graylog::countResults(
+    '000000000000',
+    new \Rpungello\Graylog\TimeRange\Relative(new \Carbon\CarbonInterval(weeks: 4)),
+    'field:value && other_field:other_value'
+);
 ```
 
 ## Testing
