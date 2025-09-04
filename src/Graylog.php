@@ -23,7 +23,7 @@ class Graylog
             RequestOptions::AUTH => [
                 $app['config']->get('graylog.token'),
                 'token',
-            ]
+            ],
         ]);
     }
 }
