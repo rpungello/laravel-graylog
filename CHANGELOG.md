@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-graylog` will be documented in this file.
 
+## 0.3.0 - 2025-09-05
+
+Map field names in search results
+
 ## 0.2.2 - 2025-09-04
 
 Fixes another handler issue when none is provided
