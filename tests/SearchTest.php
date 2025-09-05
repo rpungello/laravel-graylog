@@ -137,7 +137,7 @@ it('can count results', function () {
                     'field' => 'field2',
                 ],
             ],
-        ]))
+        ])),
     ]);
     $client = new Graylog(app(), HandlerStack::create($mock));
     $result = $client->countResults(
