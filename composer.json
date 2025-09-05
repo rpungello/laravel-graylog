@@ -2,9 +2,12 @@
     "name": "rpungello/laravel-graylog",
     "description": "Laravel package that utilizes the Graylog messages API to search for messages",
     "keywords": [
-        "Rob Pungello",
+        "rpungello",
         "laravel",
-        "laravel-graylog"
+        "graylog",
+        "logging",
+        "search",
+        "api"
     ],
     "homepage": "https://github.com/rpungello/laravel-graylog",
     "license": "MIT",
