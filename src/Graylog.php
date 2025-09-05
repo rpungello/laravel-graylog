@@ -78,13 +78,16 @@ class Graylog
      *
      * @throws GuzzleException
      */
-    public function search(string|array $streams, TimeRange $timeRange, string|Builder $query, array $fields, int $perPage = 100): array
+    public function search(string|array $streams, TimeRange $timeRange, string|Builder $query, array $fields, int $perPage = 100, ?int $maxResults = null): array
     {
         $offset = 0;
         $response = [];
         while (! empty($results = $this->executeSearch($streams, $timeRange, $query, $fields, $perPage, $offset))) {
             $response = array_merge($response, $results);
             $offset += $perPage;
+            if (is_int($maxResults) && $offset > $maxResults) {
+                return array_slice($response, 0, $maxResults);
+            }
         }
 
         return $response;
