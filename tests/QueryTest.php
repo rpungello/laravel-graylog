@@ -92,3 +92,7 @@ it('can construct complex queries', function () {
         });
     expect((string) $query)->toBe('level:<4 && (field1:/\/foo\/bar\/\d+/ || field2:>=5)');
 });
+it('can construct basic not equal queries', function () {
+    $query = Builder::begin()->and('field1', 5, '!=');
+    expect((string)$query)->toBe('NOT field1:"5"');
+});

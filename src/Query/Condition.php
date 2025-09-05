@@ -13,6 +13,8 @@ class Condition implements Stringable
     {
         if ($this->field instanceof Builder) {
             return "$this->boolean ($this->field)";
+        } elseif ($this->operator === '!=') {
+            return "$this->boolean NOT $this->field:\"$this->value\"";
         } elseif ($this->operator === 'regex') {
             return "$this->boolean $this->field:/$this->value/";
         } elseif ($this->operator === '=') {
