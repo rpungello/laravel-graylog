@@ -29,7 +29,7 @@ composer require rpungello/laravel-graylog
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-graylog-config"
+php artisan vendor:publish --tag="graylog-config"
 ```
 
 This is the contents of the published config file:
