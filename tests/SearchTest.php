@@ -92,3 +92,59 @@ it('can limit max results', function () {
 
     expect($results)->toHaveCount(1);
 });
+
+it('can count results', function () {
+    $mock = new MockHandler([
+        new Response(200, ['Content-Type' => 'application/json'], json_encode([
+            'datarows' => [
+                [
+                    'value1',
+                    'value2',
+                ],
+                [
+                    'value3',
+                    'value4',
+                ],
+            ],
+            'schema' => [
+                [
+                    'name' => 'field: field1',
+                    'column_type' => 'field',
+                    'type' => 'string',
+                    'field' => 'field1',
+                ],
+                [
+                    'name' => 'field: field2',
+                    'column_type' => 'field',
+                    'type' => 'string',
+                    'field' => 'field2',
+                ],
+            ],
+        ])),
+        new Response(200, ['Content-Type' => 'application/json'], json_encode([
+            'datarows' => [],
+            'schema' => [
+                [
+                    'name' => 'field: field1',
+                    'column_type' => 'field',
+                    'type' => 'string',
+                    'field' => 'field1',
+                ],
+                [
+                    'name' => 'field: field2',
+                    'column_type' => 'field',
+                    'type' => 'string',
+                    'field' => 'field2',
+                ],
+            ],
+        ]))
+    ]);
+    $client = new Graylog(app(), HandlerStack::create($mock));
+    $result = $client->countResults(
+        '11111',
+        new Relative(60),
+        '',
+    );
+
+    expect($result)->toBe(2);
+});
