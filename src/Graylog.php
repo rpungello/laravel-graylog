@@ -8,8 +8,10 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Arr;
 use Rpungello\Graylog\Query\Builder;
 use Rpungello\Graylog\TimeRange\TimeRange;
+use ValueError;
 
 class Graylog
 {
@@ -107,6 +109,7 @@ class Graylog
      * @return array<array>
      *
      * @throws GuzzleException
+     * @throws ValueError if the datarows from Graylog contain a different number of fields as the schema returned
      */
     public function executeSearch(string|array $streams, TimeRange $timeRange, string $query, array $fields, int $perPage = 100, int $from = 0): array
     {
@@ -122,7 +125,9 @@ class Graylog
         ]);
 
         $json = json_decode($response->getBody(), true);
+        $rows = Arr::get($json, 'datarows', []);
+        $fields = array_map(fn (array $record) => $record['field'], Arr::get($json, 'schema', []));
 
-        return array_key_exists('datarows', $json) ? $json['datarows'] : [];
+        return array_map(fn (array $row) => array_combine($fields, $row), $rows);
     }
 }
