@@ -17,7 +17,7 @@ it('can parse search results', function () {
                 [
                     'value3',
                     'value4',
-                ]
+                ],
             ],
             'schema' => [
                 [
@@ -31,7 +31,7 @@ it('can parse search results', function () {
                     'column_type' => 'field',
                     'type' => 'string',
                     'field' => 'field2',
-                ]
+                ],
             ],
         ])),
     ]);
