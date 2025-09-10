@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-graylog` will be documented in this file.
 
+## 0.3.1 - 2025-09-10
+
+Added option to limit the max results processed
+
 ## 0.3.0 - 2025-09-05
 
 Map field names in search results
