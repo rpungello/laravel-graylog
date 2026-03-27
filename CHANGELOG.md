@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-graylog` will be documented in this file.
 
+## 0.4.0 - 2026-03-27
+
+Preliminary Laravel 13 support
+
 ## 0.3.1 - 2025-09-10
 
 Added option to limit the max results processed
