@@ -24,12 +24,12 @@ class Graylog
         $host   = $app['config']->get('graylog.host');
         $port   = $app['config']->get('graylog.port');
 
-        $this->baseUrl = "{$scheme}://{$host}:{$port}";
+        $this->baseUrl = "$scheme://$host:$port";
 
         // Token authentication header (Graylog expects "Authorization: token <token>")
         $token = $app['config']->get('graylog.token');
         $this->authHeader = [
-            'Authorization' => "token {$token}",
+            'Authorization' => "token $token",
         ];
 
         // Default request headers
