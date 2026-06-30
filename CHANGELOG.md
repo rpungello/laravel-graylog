@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-graylog` will be documented in this file.
 
+## 1.0.0 - 2026-06-30
+
+Switch to using Laravel HTTP client
+
 ## 0.4.0 - 2026-03-27
 
 Preliminary Laravel 13 support
