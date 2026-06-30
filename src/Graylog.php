@@ -19,7 +19,7 @@ class Graylog
 
     protected array $defaultHeaders;
 
-    public function __construct(Application $app)
+    public function __construct(Application $app, protected int $connectTimeout = 2, protected int $timeout = 16)
     {
         // Build the base URL from config
         $scheme = $app['config']->get('graylog.https') ? 'https' : 'http';
@@ -138,6 +138,8 @@ class Graylog
     {
         return Http::withHeaders($this->defaultHeaders)
             ->withBasicAuth($this->authToken, 'token')
-            ->baseUrl($this->baseUrl);
+            ->baseUrl($this->baseUrl)
+            ->connectTimeout($this->connectTimeout)
+            ->timeout($this->timeout);
     }
 }
