@@ -15,7 +15,7 @@ class Graylog
 {
     protected string $baseUrl;
 
-    protected array $authHeader;
+    protected string $authToken;
 
     protected array $defaultHeaders;
 
@@ -26,13 +26,8 @@ class Graylog
         $host = $app['config']->get('graylog.host');
         $port = $app['config']->get('graylog.port');
 
+        $this->authToken = $app['config']->get('graylog.token');
         $this->baseUrl = "$scheme://$host:$port";
-
-        // Token authentication header (Graylog expects "Authorization: token <token>")
-        $token = $app['config']->get('graylog.token');
-        $this->authHeader = [
-            'Authorization' => "token $token",
-        ];
 
         // Default request headers
         $this->defaultHeaders = [
@@ -67,7 +62,7 @@ class Graylog
             ->get('/api/cluster');
 
         return array_values(
-            json_decode($response->body(), true)
+            $response->json()
         );
     }
 
@@ -129,7 +124,7 @@ class Graylog
         $response = $this->pendingRequest()
             ->post('/api/search/messages', $payload);
 
-        $json = json_decode($response->body(), true);
+        $json = $response->json();
         $rows = Arr::get($json, 'datarows', []);
         $schema = array_map(fn (array $record) => $record['field'], Arr::get($json, 'schema', []));
 
@@ -141,7 +136,8 @@ class Graylog
      */
     private function pendingRequest(): PendingRequest
     {
-        return Http::withHeaders($this->defaultHeaders + $this->authHeader)
+        return Http::withHeaders($this->defaultHeaders)
+            ->withBasicAuth($this->authToken, 'token')
             ->baseUrl($this->baseUrl);
     }
 }
