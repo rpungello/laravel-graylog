@@ -14,15 +14,17 @@ use ValueError;
 class Graylog
 {
     protected string $baseUrl;
+
     protected array $authHeader;
+
     protected array $defaultHeaders;
 
     public function __construct(Application $app)
     {
         // Build the base URL from config
         $scheme = $app['config']->get('graylog.https') ? 'https' : 'http';
-        $host   = $app['config']->get('graylog.host');
-        $port   = $app['config']->get('graylog.port');
+        $host = $app['config']->get('graylog.host');
+        $port = $app['config']->get('graylog.port');
 
         $this->baseUrl = "$scheme://$host:$port";
 
@@ -53,9 +55,10 @@ class Graylog
      *     lb_status: string,
      *     timezone: string,
      *     operating_system: string,
-     *     is_leader: boolean,
-     *     is_processing: boolean
+     *     is_leader: bool,
+     *     is_processing: bool
      * }>
+     *
      * @throws ConnectionException
      */
     public function cluster(): array
@@ -70,6 +73,7 @@ class Graylog
 
     /**
      * @return array<array>
+     *
      * @throws ConnectionException
      */
     public function search(string|array $streams, TimeRange $timeRange, string|Builder $query, array $fields, int $perPage = 100, ?int $maxResults = null): array
@@ -114,19 +118,19 @@ class Graylog
     public function executeSearch(string|array $streams, TimeRange $timeRange, string $query, array $fields, int $perPage = 100, int $from = 0): array
     {
         $payload = [
-            'streams'   => is_array($streams) ? $streams : [$streams],
+            'streams' => is_array($streams) ? $streams : [$streams],
             'timerange' => $timeRange->toArray(),
-            'query'     => $query,
-            'fields'    => $fields,
-            'size'      => $perPage,
-            'from'      => $from,
+            'query' => $query,
+            'fields' => $fields,
+            'size' => $perPage,
+            'from' => $from,
         ];
 
         $response = $this->pendingRequest()
             ->post('/api/search/messages', $payload);
 
-        $json   = json_decode($response->body(), true);
-        $rows   = Arr::get($json, 'datarows', []);
+        $json = json_decode($response->body(), true);
+        $rows = Arr::get($json, 'datarows', []);
         $schema = array_map(fn (array $record) => $record['field'], Arr::get($json, 'schema', []));
 
         return array_map(fn (array $row) => array_combine($schema, $row), $rows);
