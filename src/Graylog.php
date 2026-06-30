@@ -5,7 +5,7 @@ namespace Rpungello\Graylog;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http; // Laravel HTTP facade
+use Illuminate\Support\Facades\Http;
 use Rpungello\Graylog\Query\Builder;
 use Rpungello\Graylog\TimeRange\TimeRange;
 use ValueError;
