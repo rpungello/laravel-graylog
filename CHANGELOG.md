@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-graylog` will be documented in this file.
 
+## 1.1.0 - 2026-06-30
+
+Add timeouts
+
 ## 1.0.1 - 2026-06-30
 
 Fix authentication
