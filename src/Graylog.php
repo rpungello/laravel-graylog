@@ -2,44 +2,39 @@
 
 namespace Rpungello\Graylog;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\RequestOptions;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http; // Laravel HTTP facade
 use Rpungello\Graylog\Query\Builder;
 use Rpungello\Graylog\TimeRange\TimeRange;
 use ValueError;
 
 class Graylog
 {
-    protected Client $client;
+    protected string $baseUrl;
+    protected array $authHeader;
+    protected array $defaultHeaders;
 
-    public function __construct(Application $app, ?HandlerStack $stack = null)
+    public function __construct(Application $app)
     {
-        $uri = tap(new Uri)
-            ->withScheme($app['config']->get('graylog.https') ? 'https' : 'http')
-            ->withHost($app['config']->get('graylog.host'))
-            ->withPort($app['config']->get('graylog.port'));
+        // Build the base URL from config
+        $scheme = $app['config']->get('graylog.https') ? 'https' : 'http';
+        $host   = $app['config']->get('graylog.host');
+        $port   = $app['config']->get('graylog.port');
 
-        $options = [
-            'base_uri' => $uri,
-            RequestOptions::AUTH => [
-                $app['config']->get('graylog.token'),
-                'token',
-            ],
-            RequestOptions::HEADERS => [
-                'X-Requested-By' => 'rpungello/laravel-graylog',
-            ],
+        $this->baseUrl = "{$scheme}://{$host}:{$port}";
+
+        // Token authentication header (Graylog expects "Authorization: token <token>")
+        $token = $app['config']->get('graylog.token');
+        $this->authHeader = [
+            'Authorization' => "token {$token}",
         ];
 
-        if (! empty($stack) && $stack->hasHandler()) {
-            $options['handler'] = $stack;
-        }
-
-        $this->client = new Client($options);
+        // Default request headers
+        $this->defaultHeaders = [
+            'X-Requested-By' => 'rpungello/laravel-graylog',
+        ];
     }
 
     /**
@@ -60,31 +55,32 @@ class Graylog
      *     is_leader: boolean,
      *     is_processing: boolean
      * }>
-     *
-     * @throws GuzzleException
+     * @throws ConnectionException
      */
     public function cluster(): array
     {
+        $response = Http::withHeaders($this->defaultHeaders + $this->authHeader)
+            ->baseUrl($this->baseUrl)
+            ->get('/api/cluster');
+
         return array_values(
-            json_decode(
-                $this->client->get('/api/cluster')->getBody(),
-                true
-            )
+            json_decode($response->body(), true)
         );
     }
 
     /**
      * @return array<array>
-     *
-     * @throws GuzzleException
+     * @throws ConnectionException
      */
     public function search(string|array $streams, TimeRange $timeRange, string|Builder $query, array $fields, int $perPage = 100, ?int $maxResults = null): array
     {
         $offset = 0;
         $response = [];
+
         while (! empty($results = $this->executeSearch($streams, $timeRange, $query, $fields, $perPage, $offset))) {
             $response = array_merge($response, $results);
             $offset += $perPage;
+
             if (is_int($maxResults) && $offset > $maxResults) {
                 return array_slice($response, 0, $maxResults);
             }
@@ -93,13 +89,11 @@ class Graylog
         return $response;
     }
 
-    /**
-     * @throws GuzzleException
-     */
     public function countResults(string|array $streams, TimeRange $timeRange, string|Builder $query, int $perPage = 100): int
     {
         $offset = 0;
         $count = 0;
+
         while (! empty($results = $this->executeSearch($streams, $timeRange, $query, [], $perPage, $offset))) {
             $count += count($results);
             $offset += $perPage;
@@ -111,26 +105,28 @@ class Graylog
     /**
      * @return array<array>
      *
-     * @throws GuzzleException
      * @throws ValueError if the datarows from Graylog contain a different number of fields as the schema returned
+     * @throws ConnectionException
      */
     public function executeSearch(string|array $streams, TimeRange $timeRange, string $query, array $fields, int $perPage = 100, int $from = 0): array
     {
-        $response = $this->client->post('/api/search/messages', [
-            RequestOptions::JSON => [
-                'streams' => is_array($streams) ? $streams : [$streams],
-                'timerange' => $timeRange->toArray(),
-                'query' => $query,
-                'fields' => $fields,
-                'size' => $perPage,
-                'from' => $from,
-            ],
-        ]);
+        $payload = [
+            'streams'   => is_array($streams) ? $streams : [$streams],
+            'timerange' => $timeRange->toArray(),
+            'query'     => $query,
+            'fields'    => $fields,
+            'size'      => $perPage,
+            'from'      => $from,
+        ];
 
-        $json = json_decode($response->getBody(), true);
-        $rows = Arr::get($json, 'datarows', []);
-        $fields = array_map(fn (array $record) => $record['field'], Arr::get($json, 'schema', []));
+        $response = Http::withHeaders($this->defaultHeaders + $this->authHeader)
+            ->baseUrl($this->baseUrl)
+            ->post('/api/search/messages', $payload);
 
-        return array_map(fn (array $row) => array_combine($fields, $row), $rows);
+        $json   = json_decode($response->body(), true);
+        $rows   = Arr::get($json, 'datarows', []);
+        $schema = array_map(fn (array $record) => $record['field'], Arr::get($json, 'schema', []));
+
+        return array_map(fn (array $row) => array_combine($schema, $row), $rows);
     }
 }

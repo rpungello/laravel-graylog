@@ -1,23 +1,17 @@
 <?php
 
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Http;
 use Rpungello\Graylog\Graylog;
 use Rpungello\Graylog\TimeRange\Relative;
 
 it('can parse search results', function () {
-    $mock = new MockHandler([
-        new Response(200, ['Content-Type' => 'application/json'], json_encode([
+    // Fake the HTTP request that Graylog::executeSearch() will perform.
+    Http::fake([
+        // The URL is built from the base URL + path, but we can fake “*” to match any request.
+        '*' => Http::response(json_encode([
             'datarows' => [
-                [
-                    'value1',
-                    'value2',
-                ],
-                [
-                    'value3',
-                    'value4',
-                ],
+                ['value1', 'value2'],
+                ['value3', 'value4'],
             ],
             'schema' => [
                 [
@@ -33,9 +27,11 @@ it('can parse search results', function () {
                     'field' => 'field2',
                 ],
             ],
-        ])),
+        ]), 200, ['Content-Type' => 'application/json']),
     ]);
-    $client = new Graylog(app(), HandlerStack::create($mock));
+
+    $client = new Graylog(app());
+
     $results = $client->executeSearch(
         '11111',
         new Relative(60),
@@ -53,17 +49,11 @@ it('can parse search results', function () {
 });
 
 it('can limit max results', function () {
-    $mock = new MockHandler([
-        new Response(200, ['Content-Type' => 'application/json'], json_encode([
+    Http::fake([
+        '*' => Http::response(json_encode([
             'datarows' => [
-                [
-                    'value1',
-                    'value2',
-                ],
-                [
-                    'value3',
-                    'value4',
-                ],
+                ['value1', 'value2'],
+                ['value3', 'value4'],
             ],
             'schema' => [
                 [
@@ -79,9 +69,11 @@ it('can limit max results', function () {
                     'field' => 'field2',
                 ],
             ],
-        ])),
+        ]), 200, ['Content-Type' => 'application/json']),
     ]);
-    $client = new Graylog(app(), HandlerStack::create($mock));
+
+    $client = new Graylog(app());
+
     $results = $client->search(
         '11111',
         new Relative(60),
@@ -94,17 +86,12 @@ it('can limit max results', function () {
 });
 
 it('can count results', function () {
-    $mock = new MockHandler([
-        new Response(200, ['Content-Type' => 'application/json'], json_encode([
+    // First request returns two rows, second request returns none (end of pagination).
+    Http::fakeSequence()
+        ->push(json_encode([
             'datarows' => [
-                [
-                    'value1',
-                    'value2',
-                ],
-                [
-                    'value3',
-                    'value4',
-                ],
+                ['value1', 'value2'],
+                ['value3', 'value4'],
             ],
             'schema' => [
                 [
@@ -120,8 +107,8 @@ it('can count results', function () {
                     'field' => 'field2',
                 ],
             ],
-        ])),
-        new Response(200, ['Content-Type' => 'application/json'], json_encode([
+        ]), 200, ['Content-Type' => 'application/json'])
+        ->push(json_encode([
             'datarows' => [],
             'schema' => [
                 [
@@ -137,9 +124,10 @@ it('can count results', function () {
                     'field' => 'field2',
                 ],
             ],
-        ])),
-    ]);
-    $client = new Graylog(app(), HandlerStack::create($mock));
+        ]), 200, ['Content-Type' => 'application/json']);
+
+    $client = new Graylog(app());
+
     $result = $client->countResults(
         '11111',
         new Relative(60),

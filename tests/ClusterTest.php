@@ -1,31 +1,30 @@
 <?php
 
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Http;
 use Rpungello\Graylog\Graylog;
 
 it('can parse cluster data', function () {
-    $mock = new MockHandler([
-        new Response(200, ['Content-Type' => 'application/json'], json_encode([
+    Http::fake([
+        '*/api/cluster' => Http::response([
             '11111' => [
-                'facility' => 'facility',
-                'codename' => 'codename',
-                'node_id' => '00000',
-                'cluster_id' => '11111',
-                'version' => '1.2.3',
-                'started_at' => '2025-01-01T00:00:00.000Z',
-                'hostname' => 'hostname',
-                'lifecycle' => 'lifecycle',
-                'lb_status' => 'active',
-                'timezone' => 'UTC',
-                'operating_system' => 'Linux',
-                'is_leader' => true,
-                'is_processing' => true,
+                'facility'          => 'facility',
+                'codename'          => 'codename',
+                'node_id'           => '00000',
+                'cluster_id'        => '11111',
+                'version'           => '1.2.3',
+                'started_at'        => '2025-01-01T00:00:00.000Z',
+                'hostname'          => 'hostname',
+                'lifecycle'         => 'lifecycle',
+                'lb_status'         => 'active',
+                'timezone'          => 'UTC',
+                'operating_system'  => 'Linux',
+                'is_leader'         => true,
+                'is_processing'     => true,
             ],
-        ])),
+        ], 200, ['Content-Type' => 'application/json']),
     ]);
-    $client = new Graylog(app(), HandlerStack::create($mock));
+
+    $client = new Graylog(app());
     $cluster = $client->cluster();
     expect($cluster)->toBeArray()
         ->and($cluster)->toHaveCount(1)
