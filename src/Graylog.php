@@ -4,6 +4,7 @@ namespace Rpungello\Graylog;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Rpungello\Graylog\Query\Builder;
@@ -59,7 +60,7 @@ class Graylog
      */
     public function cluster(): array
     {
-        $response = $this->http()
+        $response = $this->pendingRequest()
             ->get('/api/cluster');
 
         return array_values(
@@ -88,6 +89,9 @@ class Graylog
         return $response;
     }
 
+    /**
+     * @throws ConnectionException
+     */
     public function countResults(string|array $streams, TimeRange $timeRange, string|Builder $query, int $perPage = 100): int
     {
         $offset = 0;
@@ -118,7 +122,7 @@ class Graylog
             'from'      => $from,
         ];
 
-        $response = $this->http()
+        $response = $this->pendingRequest()
             ->post('/api/search/messages', $payload);
 
         $json   = json_decode($response->body(), true);
@@ -130,10 +134,8 @@ class Graylog
 
     /**
      * Create a pre‑configured HTTP client with the default headers and base URL.
-     *
-     * @return \Illuminate\Http\Client\PendingRequest
      */
-    private function http()
+    private function pendingRequest(): PendingRequest
     {
         return Http::withHeaders($this->defaultHeaders + $this->authHeader)
             ->baseUrl($this->baseUrl);
