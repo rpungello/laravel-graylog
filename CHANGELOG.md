@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-graylog` will be documented in this file.
 
+## 1.0.1 - 2026-06-30
+
+Fix authentication
+
 ## 1.0.0 - 2026-06-30
 
 Switch to using Laravel HTTP client
