@@ -59,8 +59,7 @@ class Graylog
      */
     public function cluster(): array
     {
-        $response = Http::withHeaders($this->defaultHeaders + $this->authHeader)
-            ->baseUrl($this->baseUrl)
+        $response = $this->http()
             ->get('/api/cluster');
 
         return array_values(
@@ -119,8 +118,7 @@ class Graylog
             'from'      => $from,
         ];
 
-        $response = Http::withHeaders($this->defaultHeaders + $this->authHeader)
-            ->baseUrl($this->baseUrl)
+        $response = $this->http()
             ->post('/api/search/messages', $payload);
 
         $json   = json_decode($response->body(), true);
@@ -128,5 +126,16 @@ class Graylog
         $schema = array_map(fn (array $record) => $record['field'], Arr::get($json, 'schema', []));
 
         return array_map(fn (array $row) => array_combine($schema, $row), $rows);
+    }
+
+    /**
+     * Create a pre‑configured HTTP client with the default headers and base URL.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
+    private function http()
+    {
+        return Http::withHeaders($this->defaultHeaders + $this->authHeader)
+            ->baseUrl($this->baseUrl);
     }
 }
