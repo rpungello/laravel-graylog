@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-graylog` will be documented in this file.
 
+## 1.2.0 - 2026-11-24
+
+Add sort option to queries
+
 ## 1.1.0 - 2026-06-30
 
 Add timeouts
