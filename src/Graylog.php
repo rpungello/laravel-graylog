@@ -71,12 +71,12 @@ class Graylog
      *
      * @throws ConnectionException
      */
-    public function search(string|array $streams, TimeRange $timeRange, string|Builder $query, array $fields, int $perPage = 100, ?int $maxResults = null): array
+    public function search(string|array $streams, TimeRange $timeRange, string|Builder $query, array $fields, int $perPage = 100, ?int $maxResults = null, ?string $sortField = null, bool $sortAsc = true): array
     {
         $offset = 0;
         $response = [];
 
-        while (! empty($results = $this->executeSearch($streams, $timeRange, $query, $fields, $perPage, $offset))) {
+        while (! empty($results = $this->executeSearch($streams, $timeRange, $query, $fields, $perPage, $offset, $sortField, $sortAsc))) {
             $response = array_merge($response, $results);
             $offset += $perPage;
 
@@ -110,7 +110,7 @@ class Graylog
      * @throws ValueError if the datarows from Graylog contain a different number of fields as the schema returned
      * @throws ConnectionException
      */
-    public function executeSearch(string|array $streams, TimeRange $timeRange, string $query, array $fields, int $perPage = 100, int $from = 0): array
+    public function executeSearch(string|array $streams, TimeRange $timeRange, string $query, array $fields, int $perPage = 100, int $from = 0, ?string $sortField = null, bool $sortAsc = true): array
     {
         $payload = [
             'streams' => is_array($streams) ? $streams : [$streams],
@@ -120,6 +120,11 @@ class Graylog
             'size' => $perPage,
             'from' => $from,
         ];
+
+        if (! empty($sortField)) {
+            $payload['sort'] = $sortField;
+            $payload['sort_order'] = $sortAsc ? 'asc' : 'desc';
+        }
 
         $response = $this->pendingRequest()
             ->post('/api/search/messages', $payload);
